@@ -1,0 +1,47 @@
+From 7bf0a109d392dcba8037c9bf42d7be2dcab1cc42 Mon Sep 17 00:00:00 2001
+From: foxlesbiao <foxlesbiao@users.noreply.github.com>
+Date: Tue, 9 Jun 2026 11:33:10 +0800
+Subject: [PATCH] feat: R18 toggle with x_restrict and onlyR18 mode
+
+---
+ lib/exts.dart | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/lib/exts.dart b/lib/exts.dart
+index 87a6df3..6f037a2 100644
+--- a/lib/exts.dart
++++ b/lib/exts.dart
+@@ -91,22 +91,21 @@ extension NovelExts on Novel {
+ extension IllustExts on Illusts {
+   String get commentCountText =>
+       totalComments == null ? '' : '($totalComments)';
++
++  bool get isR18 =>
++      xRestrict > 0 || tags.any((tag) => tag.name.startsWith('R-18'));
++
+   bool hIsNotAllow() {
+-    if (userSetting.hIsNotAllow) {
+-      if (tags.any((tag) => tag.name.startsWith('R-18'))) {
+-        return true;
+-      }
++    if (userSetting.hIsNotAllow && isR18) {
++      return true;
+     }
+     return false;
+   }
+ 
+   bool hateByUser({bool ai = false, bool includeR18Setting = false}) {
+     if (includeR18Setting) {
+-      if (userSetting.hIsNotAllow) {
+-        for (final tag in tags) {
+-          if (tag.name.startsWith('R-18')) return true;
+-        }
+-      }
++      if (userSetting.hIsNotAllow && isR18) return true;
++      if (userSetting.onlyR18 && !isR18) return true;
+     }
+     if (muteStore.banAIIllust && illustAIType == 2 && !ai) {
+       return true;
+-- 
+2.39.5
+
