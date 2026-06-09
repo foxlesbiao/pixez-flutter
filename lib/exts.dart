@@ -91,22 +91,21 @@ extension NovelExts on Novel {
 extension IllustExts on Illusts {
   String get commentCountText =>
       totalComments == null ? '' : '($totalComments)';
+
+  bool get isR18 =>
+      xRestrict > 0 || tags.any((tag) => tag.name.startsWith('R-18'));
+
   bool hIsNotAllow() {
-    if (userSetting.hIsNotAllow) {
-      if (tags.any((tag) => tag.name.startsWith('R-18'))) {
-        return true;
-      }
+    if (userSetting.hIsNotAllow && isR18) {
+      return true;
     }
     return false;
   }
 
   bool hateByUser({bool ai = false, bool includeR18Setting = false}) {
     if (includeR18Setting) {
-      if (userSetting.hIsNotAllow) {
-        for (final tag in tags) {
-          if (tag.name.startsWith('R-18')) return true;
-        }
-      }
+      if (userSetting.hIsNotAllow && isR18) return true;
+      if (userSetting.onlyR18 && !isR18) return true;
     }
     if (muteStore.banAIIllust && illustAIType == 2 && !ai) {
       return true;
